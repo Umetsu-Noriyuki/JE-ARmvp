@@ -53,6 +53,34 @@ final class ArPose {
   /// 配置時の端末のコンパス方位（度、北 = 0）。取得できない端末では null
   final double? compassHeading;
 
+  ArPose copyWith({
+    double? positionX,
+    double? positionY,
+    double? positionZ,
+    double? rotationX,
+    double? rotationY,
+    double? rotationZ,
+    double? rotationW,
+    double? scale,
+    PlaneType? planeType,
+    double? Function()? compassHeading,
+  }) {
+    return ArPose(
+      positionX: positionX ?? this.positionX,
+      positionY: positionY ?? this.positionY,
+      positionZ: positionZ ?? this.positionZ,
+      rotationX: rotationX ?? this.rotationX,
+      rotationY: rotationY ?? this.rotationY,
+      rotationZ: rotationZ ?? this.rotationZ,
+      rotationW: rotationW ?? this.rotationW,
+      scale: scale ?? this.scale,
+      planeType: planeType ?? this.planeType,
+      compassHeading: compassHeading != null
+          ? compassHeading()
+          : this.compassHeading,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
     'positionX': positionX,
     'positionY': positionY,

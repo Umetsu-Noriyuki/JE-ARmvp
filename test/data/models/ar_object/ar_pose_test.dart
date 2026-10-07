@@ -50,5 +50,28 @@ void main() {
 
       expect(() => ArPose.fromJson(json), throwsFormatException);
     });
+
+    test('正常系: copyWith で指定項目のみ変更される', () {
+      final copied = SAMPLE_POSE.copyWith(
+        scale: 2,
+        planeType: PlaneType.vertical,
+      );
+
+      expect(copied.scale, 2);
+      expect(copied.planeType, PlaneType.vertical);
+      expect(copied.positionX, SAMPLE_POSE.positionX);
+      expect(copied.compassHeading, SAMPLE_POSE.compassHeading);
+    });
+
+    test('正常系: 引数なしの copyWith は等価なオブジェクトを返す', () {
+      expect(SAMPLE_POSE.copyWith(), SAMPLE_POSE);
+    });
+
+    test('正常系: compassHeading に () => null を渡すと null になる', () {
+      expect(
+        SAMPLE_POSE.copyWith(compassHeading: () => null).compassHeading,
+        isNull,
+      );
+    });
   });
 }

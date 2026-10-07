@@ -41,6 +41,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>カメラ映像にARオブジェクトを配置・表示するために使用します。</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>ARオブジェクトを配置した場所を記録し、共有されたARの場所を判定するために使用します。</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
