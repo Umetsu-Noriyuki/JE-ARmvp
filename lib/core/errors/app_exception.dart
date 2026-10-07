@@ -12,3 +12,13 @@ sealed class AppException implements Exception {
 final class NotFoundException extends AppException {
   const NotFoundException(super.message);
 }
+
+/// 同じキーのデータが既に存在する
+final class DuplicateException extends AppException {
+  const DuplicateException(super.message);
+}
+
+/// 保存データの形式が不正で読み込めない
+final class DataFormatException extends AppException {
+  const DataFormatException(super.message);
+}

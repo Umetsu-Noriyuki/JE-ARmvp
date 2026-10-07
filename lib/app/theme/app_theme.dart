@@ -5,7 +5,9 @@ import 'package:ar_app/app/theme/app_text_styles.dart';
 
 /// アプリ全体の ThemeData 定義
 abstract final class AppTheme {
-  static ThemeData get light {
+  static final ThemeData light = _buildLight();
+
+  static ThemeData _buildLight() {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: AppColors.PRIMARY_NAVY,
       primary: AppColors.PRIMARY_NAVY,

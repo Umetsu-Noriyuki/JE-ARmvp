@@ -42,5 +42,18 @@ void main() {
         'expires_at': true,
       });
     });
+
+    test('正常系: created_at にインデックスが作成されている', () async {
+      final database = createInMemoryDatabase();
+
+      final rows = await database
+          .customSelect(
+            "SELECT sql FROM sqlite_master WHERE type = 'index' "
+            "AND name = 'ar_objects_created_at'",
+          )
+          .get();
+
+      expect(rows.single.read<String>('sql'), contains('(created_at)'));
+    });
   });
 }

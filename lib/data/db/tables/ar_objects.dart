@@ -7,6 +7,7 @@ import 'package:ar_app/data/db/converters/ar_object_converters.dart';
 
 /// 端末内のARオブジェクト
 @DataClassName('ArObjectRecord')
+@TableIndex(name: 'ar_objects_created_at', columns: {#createdAt})
 class ArObjects extends Table {
   TextColumn get objectId => text()();
   TextColumn get ownerId => text().nullable()();

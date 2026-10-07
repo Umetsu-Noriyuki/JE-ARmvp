@@ -13,10 +13,13 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
 }
 
 /// 開発用 Linux/WSL では libsqlite3-dev 未導入だと `libsqlite3.so` が無いため、
-/// ランタイムに含まれる `libsqlite3.so.0` を読み込む
+/// 開けない場合のみランタイムに含まれる `libsqlite3.so.0` を読み込む
 void _useVersionedSqliteLibraryOnLinux() {
-  open.overrideFor(
-    OperatingSystem.linux,
-    () => DynamicLibrary.open('libsqlite3.so.0'),
-  );
+  open.overrideFor(OperatingSystem.linux, () {
+    try {
+      return DynamicLibrary.open('libsqlite3.so');
+    } on ArgumentError {
+      return DynamicLibrary.open('libsqlite3.so.0');
+    }
+  });
 }

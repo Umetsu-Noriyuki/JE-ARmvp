@@ -23,11 +23,13 @@ void main() {
   });
 
   group('appDatabaseProvider', () {
+    // onDispose では close 完了を待てないため、一時ディレクトリ削除前に
+    // テスト側で close 完了を待つ（close は冪等。tearDown は登録の逆順に実行される）
     test('正常系: AppDatabase を生成し、同一コンテナ内では同じインスタンスを返す', () {
       final container = ProviderContainer();
-      addTearDown(container.dispose);
-
       final database = container.read(appDatabaseProvider);
+      addTearDown(database.close);
+      addTearDown(container.dispose);
 
       expect(database, isA<AppDatabase>());
       expect(container.read(appDatabaseProvider), same(database));
@@ -35,7 +37,8 @@ void main() {
 
     test('正常系: コンテナ破棄時に例外なく DB を閉じる', () {
       final container = ProviderContainer();
-      container.read(appDatabaseProvider);
+      final database = container.read(appDatabaseProvider);
+      addTearDown(database.close);
 
       expect(container.dispose, returnsNormally);
     });

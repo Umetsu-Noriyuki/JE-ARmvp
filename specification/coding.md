@@ -80,6 +80,7 @@ canEdit
 ```
 
 - Widget のクラス名は語尾を Widget / Page / Screen / View で統一
+  - ただし、アプリのルート Widget（`lib/app/app.dart` の `App`）は例外とする
 
 ```
 HomeScreen

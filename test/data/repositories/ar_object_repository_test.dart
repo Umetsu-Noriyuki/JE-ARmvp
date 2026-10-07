@@ -1,18 +1,30 @@
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:ar_app/core/enums/ar_object_type.dart';
 import 'package:ar_app/core/enums/share_status.dart';
 import 'package:ar_app/core/errors/app_exception.dart';
+import 'package:ar_app/data/db/app_database.dart';
 import 'package:ar_app/data/repositories/ar_object_repository.dart';
 
 import '../../helper/ar_object_fixtures.dart';
 
 void main() {
+  late AppDatabase database;
   late ArObjectRepository repository;
 
   setUp(() {
-    repository = ArObjectRepository(createInMemoryDatabase());
+    database = createInMemoryDatabase();
+    repository = ArObjectRepository(database);
   });
+
+  /// content 列に不正な JSON を持つ行を直接書き込む
+  Future<void> insertBrokenRecord() async {
+    await repository.insert(buildArObject(objectId: 'broken'));
+    await database.customUpdate(
+      "UPDATE ar_objects SET content = '{broken' WHERE object_id = 'broken'",
+      updates: {database.arObjects},
+    );
+  }
 
   group('ArObjectRepository.insert / findById', () {
     test('正常系: 保存したオブジェクトを全項目そのまま取得できる', () async {
@@ -43,7 +55,53 @@ void main() {
 
       expect(
         () => repository.insert(buildArObject()),
-        throwsA(isA<SqliteException>()),
+        throwsA(isA<DuplicateException>()),
+      );
+    });
+
+    test('正常系: objectType 列には content の種類が保存される', () async {
+      await repository.insert(buildArObject(objectId: 'text'));
+      await repository.insert(
+        buildArObject(objectId: 'shape', content: SAMPLE_SHAPE_CONTENT),
+      );
+
+      final records = await database.select(database.arObjects).get();
+      final types = {
+        for (final record in records) record.objectId: record.objectType,
+      };
+
+      expect(types, {'text': ArObjectType.text, 'shape': ArObjectType.shape});
+    });
+
+    test('正常系: ローカル時刻で保存しても同じ時刻の UTC として取得できる', () async {
+      final createdAt = DateTime(2026, 9, 30, 19, 0, 0, 123);
+      final expiresAt = DateTime(2026, 10, 1, 19);
+
+      await repository.insert(
+        buildArObject(
+          createdAt: createdAt,
+          shareStatus: ShareStatus.sharing,
+          expiresAt: expiresAt,
+        ),
+      );
+      final object = await repository.findById('object-1');
+
+      final row = await database
+          .customSelect('SELECT created_at FROM ar_objects')
+          .getSingle();
+
+      expect(row.read<String>('created_at'), endsWith('Z'));
+      expect(object?.createdAt.isUtc, isTrue);
+      expect(object?.createdAt, createdAt.toUtc());
+      expect(object?.expiresAt, expiresAt.toUtc());
+    });
+
+    test('異常系: 保存データが壊れている場合は DataFormatException', () async {
+      await insertBrokenRecord();
+
+      expect(
+        () => repository.findById('broken'),
+        throwsA(isA<DataFormatException>()),
       );
     });
   });
@@ -103,6 +161,27 @@ void main() {
       expect(objects.map((object) => object.objectId), ['new', 'mid', 'old']);
     });
 
+    test('正常系: ローカル時刻と UTC が混在しても作成日時の新しい順になる', () async {
+      final base = DateTime.utc(2026, 9, 30, 10);
+      await repository.insert(
+        buildArObject(
+          objectId: 'old',
+          createdAt: base.subtract(const Duration(hours: 1)),
+        ),
+      );
+      await repository.insert(
+        buildArObject(
+          objectId: 'new',
+          createdAt: base.add(const Duration(hours: 1)).toLocal(),
+        ),
+      );
+      await repository.insert(buildArObject(objectId: 'mid', createdAt: base));
+
+      final objects = await repository.watchAll().first;
+
+      expect(objects.map((object) => object.objectId), ['new', 'mid', 'old']);
+    });
+
     test('正常系: 0件の場合は空リストを返す', () async {
       expect(await repository.watchAll().first, isEmpty);
     });
@@ -134,6 +213,12 @@ void main() {
       final objects = await repository.watchAll().first;
 
       expect(() => objects.add(buildArObject()), throwsUnsupportedError);
+    });
+
+    test('異常系: 保存データが壊れている場合は DataFormatException', () async {
+      await insertBrokenRecord();
+
+      expect(repository.watchAll().first, throwsA(isA<DataFormatException>()));
     });
   });
 }

@@ -844,11 +844,18 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $ArObjectsTable arObjects = $ArObjectsTable(this);
+  late final Index arObjectsCreatedAt = Index(
+    'ar_objects_created_at',
+    'CREATE INDEX ar_objects_created_at ON ar_objects (created_at)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [arObjects];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    arObjects,
+    arObjectsCreatedAt,
+  ];
   @override
   DriftDatabaseOptions get options =>
       const DriftDatabaseOptions(storeDateTimeAsText: true);

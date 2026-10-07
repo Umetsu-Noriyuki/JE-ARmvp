@@ -38,6 +38,10 @@ final class ArObject {
   final String? placeName;
 
   /// サムネイル画像の端末内パス
+  ///
+  /// アプリのドキュメントディレクトリからの相対パスで保持する。
+  /// iOS はアプリ更新でコンテナパスが変わるため、絶対パスで保存しないこと。
+  /// 利用時に `getApplicationDocumentsDirectory()` と結合する。
   final String? thumbnailPath;
   final DateTime createdAt;
 

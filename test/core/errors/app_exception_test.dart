@@ -19,4 +19,24 @@ void main() {
       );
     });
   });
+
+  group('DuplicateException', () {
+    test('正常系: message を保持し AppException として扱える', () {
+      const exception = DuplicateException('duplicated');
+
+      expect(exception, isA<AppException>());
+      expect(exception.message, 'duplicated');
+      expect(exception.toString(), 'DuplicateException: duplicated');
+    });
+  });
+
+  group('DataFormatException', () {
+    test('正常系: message を保持し AppException として扱える', () {
+      const exception = DataFormatException('invalid');
+
+      expect(exception, isA<AppException>());
+      expect(exception.message, 'invalid');
+      expect(exception.toString(), 'DataFormatException: invalid');
+    });
+  });
 }
