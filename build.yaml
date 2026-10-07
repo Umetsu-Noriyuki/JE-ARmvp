@@ -1,0 +1,7 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          # ミリ秒精度・タイムゾーンを保持するため ISO-8601 文字列で保存する
+          store_date_time_values_as_text: true

@@ -58,6 +58,10 @@ lib/
 │   │   ├── app_database.dart               // DB接続定義
 │   │   ├── app_database.g.dart             // Drift生成コード（build_runner、ソースと同階層に生成しコミットする）
 │   │   │
+│   │   ├── converters/                     // Drift TypeConverter（JSON列などの型変換）
+│   │   │   ├── xxx_converters.dart
+│   │   │   └── :
+│   │   │
 │   │   └── tables/
 │   │       ├── xxx_xxx.dart                // 各機能別のテーブル定義
 │   │       └── :
