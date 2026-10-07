@@ -56,6 +56,7 @@ lib/
 ├── data/                                   // データ層（アプリの中核）
 │   ├── db/                                 // Drift(SQLite) 関連
 │   │   ├── app_database.dart               // DB接続定義
+│   │   ├── app_database.g.dart             // Drift生成コード（build_runner、ソースと同階層に生成しコミットする）
 │   │   │
 │   │   └── tables/
 │   │       ├── xxx_xxx.dart                // 各機能別のテーブル定義
@@ -121,17 +122,23 @@ lib/
 │       ├── app_scaffold.dart               // 共通Scaffold
 │       └── responsive_layout.dart          // レスポンシブ対応
 │
-├── infrastructure/                         // インフラ
-│   ├── cdk/                                // CDKによるインフラ構築コード（Typescriptプロジェクト）
-│   │
-│   ├── lambda/                             // Lambda関数（Typescriptプロジェクト）
-│   │   ├── xxx_xxx_api/                    // xxx_xxx機能API
-│   │   :
-│   :
-│
-└── generated/                              // build_runner生成コード
-    ├── drift/                              // Drift生成
+└── generated/                              // 生成コード
     └── l10n/                               // 多言語生成
+```
+
+- Drift の生成コード（`*.g.dart`）は `lib/generated/` には置かず、build_runner のデフォルトどおりソースファイルと同じ階層に生成し、コミットする
+
+## リポジトリルート直下のインフラ構成
+
+AWSインフラは Flutter のビルド対象（`lib/`）から分離し、リポジトリルート直下に配置する。
+
+```
+infrastructure/
+├── cdk/                                    // CDKによるインフラ構築コード（Typescriptプロジェクト）
+│
+└── lambda/                                 // Lambda関数（Typescriptプロジェクト）
+    ├── xxx_xxx_api/                        // xxx_xxx機能API
+    :
 ```
 
 ## ディレクトリ構成に無い場合
